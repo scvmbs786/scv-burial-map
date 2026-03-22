@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SCV Muslim Burial Plots</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <h1>Burial Plot Map</h1>
+      <p>Click a plot to view details and status.</p>
+    </header>
+
+    <main class="main">
+      <section class="map-section">
+        <!-- Inline SVG so each plot is clickable -->
+        <!-- Replace with your actual SVG content -->
+        <svg id="burial-map" viewBox="0 0 1000 700">
+          <!-- Example plot rectangles; each needs a unique data-plot-id -->
+          <rect x="50" y="50" width="60" height="40"
+                class="plot"
+                data-plot-id="A-01" />
+          <rect x="120" y="50" width="60" height="40"
+                class="plot"
+                data-plot-id="A-02" />
+          <rect x="190" y="50" width="60" height="40"
+                class="plot"
+                data-plot-id="A-03" />
+          <!-- ...repeat for all plots, matching IDs in PLOTS -->
+        </svg>
+
+        <div class="legend">
+          <h2>Legend</h2>
+          <ul>
+            <li><span class="legend-color available"></span>Available</li>
+            <li><span class="legend-color reserved"></span>Reserved</li>
+            <li><span class="legend-color sold"></span>Sold</li>
+            <li><span class="legend-color special"></span>Special / Notes</li>
+          </ul>
+        </div>
+      </section>
+
+      <aside class="details-panel" id="details-panel">
+        <h2>Plot Details</h2>
+        <div id="details-content">
+          <p>Select a plot on the map.</p>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="plots-data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
