@@ -26,8 +26,8 @@ const plotRows = [
     plots: [
       { plot: 300, spacesTop: 4, spacesBottom: 4 }, // full
       { plot: 301, spacesTop: 2, spacesBottom: 4 }, // 6 spaces
-      { plot: 302, spacesTop: 0, spacesBottom: 4 }, // bottom only
-      { plot: 303, spacesTop: 0, spacesBottom: 2 }  // bottom only
+      { plot: 302, spacesTop: 4, spacesBottom: 4 }, // bottom only
+      { plot: 303, spacesTop: 2, spacesBottom: 2 }  // bottom only
     ]
   },
 
