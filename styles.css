@@ -147,6 +147,11 @@ main {
   pointer-events: none; /* so clicking still selects the space */
 }
 
+.space.highlight {
+  stroke: gold;
+  stroke-width: 3px;
+}
+
 /* Details */
 
 #details-content p {

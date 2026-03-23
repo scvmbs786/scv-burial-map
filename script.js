@@ -173,6 +173,35 @@ function renderMap(spaceStatus) {
       ${info.note ? `<p><strong>Note:</strong> ${info.note}</p>` : ""}
     `;
   }
+
+  function searchSpacesByName(spaceStatus) {
+    const input = document.getElementById("searchInput");
+    const query = input.value.trim().toLowerCase();
+
+    const allSpaces = document.querySelectorAll("rect.space");
+
+    // If search is empty → clear highlights
+    if (query === "") {
+      allSpaces.forEach(rect => rect.classList.remove("highlight"));
+      return;
+    }
+
+    allSpaces.forEach(rect => {
+      const plot = rect.dataset.plot;
+      const space = rect.dataset.space;
+      const key = `${plot}-${space}`;
+
+      const info = spaceStatus[key];
+      const name = info?.name?.toLowerCase() || "";
+
+      if (name.includes(query)) {
+        rect.classList.add("highlight");
+      } else {
+        rect.classList.remove("highlight");
+      }
+    });
+  }
+
 }
 
 // ------------------------------------------------------------
@@ -181,5 +210,9 @@ function renderMap(spaceStatus) {
 document.addEventListener("DOMContentLoaded", () => {
   loadSpaceStatus().then(spaceStatus => {
     renderMap(spaceStatus);
+
+    // Attach search handler
+    const input = document.getElementById("searchInput");
+    input.addEventListener("input", () => searchSpacesByName(spaceStatus));
   });
 });
