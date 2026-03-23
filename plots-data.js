@@ -12,7 +12,7 @@ const plotRows = [
     ]
   },
 
-  // Row 2: only plot 200, 4 top + 5 bottom
+  // Row 2: now contains plot 200 and plot 201
   {
     rowIndex: 2,
     plots: [
@@ -27,8 +27,8 @@ const plotRows = [
     plots: [
       { plot: 300, spacesTop: 4, spacesBottom: 4 }, // full
       { plot: 301, spacesTop: 2, spacesBottom: 4 }, // 6 spaces
-      { plot: 302, spacesTop: 4, spacesBottom: 4 }, // bottom only
-      { plot: 303, spacesTop: 2, spacesBottom: 2 }  // bottom only
+      { plot: 302, spacesTop: 4, spacesBottom: 4 }, // full
+      { plot: 303, spacesTop: 2, spacesBottom: 2 }  // half
     ]
   },
 
@@ -39,7 +39,7 @@ const plotRows = [
       { plot: 400, spacesTop: 4, spacesBottom: 4 },
       { plot: 401, spacesTop: 4, spacesBottom: 4 },
       { plot: 402, spacesTop: 4, spacesBottom: 4 },
-      { plot: 403, spacesTop: 2, spacesBottom: 2 } // half
+      { plot: 403, spacesTop: 2, spacesBottom: 2 }
     ]
   },
 
