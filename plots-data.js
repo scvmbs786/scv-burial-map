@@ -16,7 +16,8 @@ const plotRows = [
   {
     rowIndex: 2,
     plots: [
-      { plot: 200, spacesTop: 4, spacesBottom: 5 }
+      { plot: 200, spacesTop: 4, spacesBottom: 4 }
+      { plot: 201, spacesTop: 4, spacesBottom: 1 }
     ]
   },
 
