@@ -16,7 +16,7 @@ function statusToClass(status) {
   switch (status) {
     case "reserved": return "reserved";
     case "occupied": return "occupied";
-    case "sold": return "occupied"; // sold behaves like occupied visually
+    case "sold": return "occupied";
     case "not-available": return "not-available";
     default: return "available";
   }
@@ -66,9 +66,9 @@ function renderMap(spaceStatus) {
           rect.dataset.plot = plot;
           rect.dataset.space = spaceNumber;
 
-	  if (status !== "not-available") {
-	    rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
-  	  }
+          if (status !== "not-available") {
+            rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
+          }
           svg.appendChild(rect);
 
           const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -104,9 +104,9 @@ function renderMap(spaceStatus) {
         rect.dataset.plot = plot;
         rect.dataset.space = spaceNumber;
 
-	if (status !== "not-available") {
-		rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
-	}
+        if (status !== "not-available") {
+          rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
+        }
         svg.appendChild(rect);
 
         const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -173,36 +173,41 @@ function renderMap(spaceStatus) {
       ${info.note ? `<p><strong>Note:</strong> ${info.note}</p>` : ""}
     `;
   }
+}
 
-  function searchSpacesByName(spaceStatus) {
-    const input = document.getElementById("searchInput");
-    const query = input.value.trim().toLowerCase();
 
-    const allSpaces = document.querySelectorAll("rect.space");
 
-    // If search is empty → clear highlights
-    if (query === "") {
-      allSpaces.forEach(rect => rect.classList.remove("highlight"));
-      return;
-    }
+// ------------------------------------------------------------
+// 🔍 SEARCH FUNCTION (must be OUTSIDE renderMap)
+// ------------------------------------------------------------
+function searchSpacesByName(spaceStatus) {
+  const input = document.getElementById("searchInput");
+  const query = input.value.trim().toLowerCase();
 
-    allSpaces.forEach(rect => {
-      const plot = rect.dataset.plot;
-      const space = rect.dataset.space;
-      const key = `${plot}-${space}`;
+  const allSpaces = document.querySelectorAll("rect.space");
 
-      const info = spaceStatus[key];
-      const name = info?.name?.toLowerCase() || "";
-
-      if (name.includes(query)) {
-        rect.classList.add("highlight");
-      } else {
-        rect.classList.remove("highlight");
-      }
-    });
+  if (query === "") {
+    allSpaces.forEach(rect => rect.classList.remove("highlight"));
+    return;
   }
 
+  allSpaces.forEach(rect => {
+    const plot = rect.dataset.plot;
+    const space = rect.dataset.space;
+    const key = `${plot}-${space}`;
+
+    const info = spaceStatus[key];
+    const name = info?.name?.toLowerCase() || "";
+
+    if (name.includes(query)) {
+      rect.classList.add("highlight");
+    } else {
+      rect.classList.remove("highlight");
+    }
+  });
 }
+
+
 
 // ------------------------------------------------------------
 // 🔥 Load Google Sheet → Then Render Map
@@ -211,7 +216,6 @@ document.addEventListener("DOMContentLoaded", () => {
   loadSpaceStatus().then(spaceStatus => {
     renderMap(spaceStatus);
 
-    // Attach search handler
     const input = document.getElementById("searchInput");
     input.addEventListener("input", () => searchSpacesByName(spaceStatus));
   });
