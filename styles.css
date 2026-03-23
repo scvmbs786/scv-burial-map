@@ -148,8 +148,9 @@ main {
 }
 
 .space.highlight {
-  stroke: gold;
-  stroke-width: 3px;
+  stroke: #ffcc00;          /* bold gold outline */
+  stroke-width: 4px;        /* thicker border */
+  fill: #fff3b0 !important; /* soft yellow background */
 }
 
 /* Details */
