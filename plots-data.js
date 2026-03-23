@@ -107,29 +107,19 @@ const DEFAULT_STATUS = "available";
 // ------------------------------------------------------------
 
 async function loadSpaceStatus() {
-  const url =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfS4G2w4E3pPiWBTYFT4NeZETPD35dATRsWENZyLFIMMG3qIi6jhGB_7ktWkvxj1PNH8pXvq3HcnHA/gviz/tq?tqx=out:json";
+  const url = "https://script.google.com/macros/s/AKfycbxEfG4o0D6E-hX5bapWGiWGTmulGCIi2WL1y6QkSmI_qp_xPlcZY3jWEp4mVDRq5ZQWbw/exec";
 
   const response = await fetch(url);
-  const text = await response.text();
+  const rows = await response.json(); // clean JSON from Apps Script
 
-  // Extract JSON from Google’s weird JS wrapper
-  const json = JSON.parse(
-    text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1)
-  );
-
-  const rows = json.table.rows;
   const spaceStatus = {};
 
   rows.forEach(row => {
-    const c = row.c;
-    if (!c) return;
-
-    const name = c[0]?.v || "";
-    const plot = c[3]?.v;
-    const spaceRaw = c[4]?.v; // Space Number
-    const statusRaw = c[7]?.v;
-    const note = c[20]?.v || "";
+    const plot = row["Plot Number"];
+    const spaceRaw = row["Space Number"];
+    const statusRaw = row["Status"];
+    const name = row["Name"] || "";
+    const note = row["Notes"] || "";
 
     if (!plot || !spaceRaw) return;
 
