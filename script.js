@@ -33,7 +33,7 @@ function renderMap() {
   plotRows.forEach((row) => {
     let currentX = margin;
 
-    // Determine if this row has top spaces at all
+    // Determine row height based on whether any plot has top spaces
     const rowHasTop = row.plots.some(p => p.spacesTop > 0);
     const rowHasBottom = row.plots.some(p => p.spacesBottom > 0);
 
@@ -56,7 +56,7 @@ function renderMap() {
       let maxSpaceX = plotStartX;
       let maxSpaceY = rowTopY;
 
-      // TOP SPACES
+      // TOP SPACES (only if spacesTop > 0)
       if (spacesTop > 0) {
         for (let i = 0; i < spacesTop; i++) {
           const spaceNumber = i + 1;
@@ -90,7 +90,7 @@ function renderMap() {
         }
       }
 
-      // BOTTOM SPACES (aligned across row)
+      // BOTTOM SPACES (always if spacesBottom > 0)
       if (spacesBottom > 0) {
         const bottomStart = spacesTop > 0 ? 5 : 1;
 
