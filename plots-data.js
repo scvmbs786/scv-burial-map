@@ -91,7 +91,7 @@ const plotRows = [
     rowIndex: 9,
     plots: [
       { plot: 900, spacesTop: 4, spacesBottom: 4 },
-      { plot: 901, spacesTop: 2, spacesBottom: 2 }, // your example
+      { plot: 901, spacesTop: 2, spacesBottom: 4s }, // your example
       { plot: 902, spacesTop: 4, spacesBottom: 4 },
       { plot: 903, spacesTop: 2, spacesBottom: 2 }
     ]
