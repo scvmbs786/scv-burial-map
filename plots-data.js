@@ -4,15 +4,15 @@ const SPACE_GAP = 4;
 
 // Map definition: each entry is a "plot row"
 const plotRows = [
-  // Row 1: only plot 100, 3 spaces (bottom only)
+  // Row 1: Plot 100 (1 top, 3 bottom)
   {
     rowIndex: 1,
     plots: [
-      { plot: 100, spacesTop: 0, spacesBottom: 3 }
+      { plot: 100, spacesTop: 1, spacesBottom: 3 }
     ]
   },
 
-  // Row 2: now contains plot 200 and plot 201
+  // Row 2: Plot 200 + Plot 201
   {
     rowIndex: 2,
     plots: [
@@ -25,14 +25,14 @@ const plotRows = [
   {
     rowIndex: 3,
     plots: [
-      { plot: 300, spacesTop: 4, spacesBottom: 4 }, // full
-      { plot: 301, spacesTop: 2, spacesBottom: 4 }, // 6 spaces
-      { plot: 302, spacesTop: 4, spacesBottom: 4 }, // full
-      { plot: 303, spacesTop: 2, spacesBottom: 2 }  // half
+      { plot: 300, spacesTop: 4, spacesBottom: 4 },
+      { plot: 301, spacesTop: 2, spacesBottom: 4 },
+      { plot: 302, spacesTop: 4, spacesBottom: 4 },
+      { plot: 303, spacesTop: 2, spacesBottom: 2 }
     ]
   },
 
-  // Row 4: 400–403 (3 full, 1 half)
+  // Row 4: 400–403
   {
     rowIndex: 4,
     plots: [
@@ -106,12 +106,11 @@ const DEFAULT_STATUS = "available";
 // ------------------------------------------------------------
 // 🔥 DYNAMIC GOOGLE SHEETS LOADER
 // ------------------------------------------------------------
-
 async function loadSpaceStatus() {
   const url = "https://script.google.com/macros/s/AKfycbxEfG4o0D6E-hX5bapWGiWGTmulGCIi2WL1y6QkSmI_qp_xPlcZY3jWEp4mVDRq5ZQWbw/exec";
 
   const response = await fetch(url);
-  const rows = await response.json(); // clean JSON from Apps Script
+  const rows = await response.json();
 
   const spaceStatus = {};
 
@@ -124,10 +123,8 @@ async function loadSpaceStatus() {
 
     if (!plot || !spaceRaw) return;
 
-    // Split comma-separated spaces
     const spaces = spaceRaw.toString().split(",").map(s => s.trim());
 
-    // Normalize status
     let status = DEFAULT_STATUS;
     if (statusRaw) {
       const s = statusRaw.toLowerCase();
