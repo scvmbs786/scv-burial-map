@@ -47,6 +47,7 @@ function renderMap() {
       let maxSpaceY = plotStartY;
 
       // TOP SPACES
+      if (spacesTop > 0) {
       for (let i = 0; i < spacesTop; i++) {
         const spaceNumber = i + 1;
         const x = currentX + i * (SPACE_SIZE + SPACE_GAP);
@@ -77,6 +78,7 @@ function renderMap() {
         maxSpaceX = Math.max(maxSpaceX, x + SPACE_SIZE);
         maxSpaceY = Math.max(maxSpaceY, y + SPACE_SIZE);
       }
+    }
 
       // BOTTOM SPACES
       const hasTop = spacesTop > 0;
