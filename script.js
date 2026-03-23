@@ -1,61 +1,141 @@
-// Helper: get color for a plot based on its status + notes
-function getPlotColor(plotData) {
-  if (!plotData) return "#e0e0e0";
+function getSpaceKey(plot, space) {
+  return `${plot}-${space}`;
+}
 
-  // If there are notes and not sold, you might treat as "special"
-  if (plotData.notes && plotData.status !== "sold") {
-    return STATUS_COLORS.special;
+function getSpaceInfo(plot, space) {
+  const key = getSpaceKey(plot, space);
+  const info = spaceStatus[key] || {};
+  return {
+    status: info.status || DEFAULT_STATUS,
+    name: info.name || null,
+    note: info.note || null
+  };
+}
+
+function statusToClass(status) {
+  switch (status) {
+    case "reserved": return "reserved";
+    case "occupied": return "occupied";
+    default: return "available";
   }
-
-  return STATUS_COLORS[plotData.status] || "#e0e0e0";
 }
 
-// Helper: get CSS class for status pill
-function getStatusClass(status, hasNotes) {
-  if (hasNotes && status !== "sold") return "status-special";
-  return `status-${status}`;
-}
-
-function renderDetails(plotId, plotData) {
-  const panel = document.getElementById("details-content");
-
-  if (!plotData) {
-    panel.innerHTML = `
-      <p><strong>Plot:</strong> ${plotId}</p>
-      <p>No data found for this plot.</p>
-    `;
-    return;
-  }
-
-  const hasNotes = !!plotData.notes;
-  const statusClass = getStatusClass(plotData.status, hasNotes);
-  const statusLabel = hasNotes && plotData.status !== "sold"
-    ? "Special / Notes"
-    : plotData.status.charAt(0).toUpperCase() + plotData.status.slice(1);
-
-  panel.innerHTML = `
-    <p><strong>Plot:</strong> ${plotId}</p>
-    <p><strong>Status:</strong>
-      <span class="status-pill ${statusClass}">${statusLabel}</span>
-    </p>
-    <p><strong>Notes:</strong> ${plotData.notes || "None"}</p>
-  `;
-}
-
-document.addEventListener("DOMContentLoaded", () => {
+function renderMap() {
   const svg = document.getElementById("burial-map");
-  const plotElements = svg.querySelectorAll(".plot");
+  const details = document.getElementById("details-content");
 
-  plotElements.forEach((el) => {
-    const plotId = el.getAttribute("data-plot-id");
-    const plotData = PLOTS[plotId];
+  const margin = 20;
+  let currentY = margin;
 
-    // Set initial color
-    el.setAttribute("fill", getPlotColor(plotData));
+  let maxWidth = 0;
 
-    // Click handler
-    el.addEventListener("click", () => {
-      renderDetails(plotId, plotData);
+  // Clear SVG
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  plotRows.forEach((row) => {
+    let currentX = margin;
+    let rowHeight = 0;
+
+    row.plots.forEach((plotDef) => {
+      const { plot, spacesTop, spacesBottom } = plotDef;
+
+      const colsTop = spacesTop;
+      const colsBottom = spacesBottom;
+
+      const cols = Math.max(colsTop, colsBottom);
+      const plotWidth = cols * (SPACE_SIZE + SPACE_GAP) - SPACE_GAP;
+
+      // Top row of spaces
+      for (let i = 0; i < spacesTop; i++) {
+        const spaceNumber = i + 1;
+        const x = currentX + i * (SPACE_SIZE + SPACE_GAP);
+        const y = currentY;
+
+        const { status } = getSpaceInfo(plot, spaceNumber);
+
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", x);
+        rect.setAttribute("y", y);
+        rect.setAttribute("width", SPACE_SIZE);
+        rect.setAttribute("height", SPACE_SIZE);
+        rect.setAttribute("class", `space ${statusToClass(status)}`);
+        rect.dataset.plot = plot;
+        rect.dataset.space = spaceNumber;
+
+        rect.addEventListener("click", () => {
+          selectSpace(rect, plot, spaceNumber);
+        });
+
+        svg.appendChild(rect);
+      }
+
+      // Bottom row of spaces
+      const hasTop = spacesTop > 0;
+      const bottomRowIndexStart = hasTop ? 5 : 1; // if no top, bottom starts at 1
+
+      const bottomY = currentY + (hasTop ? SPACE_SIZE + SPACE_GAP : 0);
+
+      for (let i = 0; i < spacesBottom; i++) {
+        const spaceNumber = bottomRowIndexStart + i;
+        const x = currentX + i * (SPACE_SIZE + SPACE_GAP);
+        const y = bottomY;
+
+        const { status } = getSpaceInfo(plot, spaceNumber);
+
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", x);
+        rect.setAttribute("y", y);
+        rect.setAttribute("width", SPACE_SIZE);
+        rect.setAttribute("height", SPACE_SIZE);
+        rect.setAttribute("class", `space ${statusToClass(status)}`);
+        rect.dataset.plot = plot;
+        rect.dataset.space = spaceNumber;
+
+        rect.addEventListener("click", () => {
+          selectSpace(rect, plot, spaceNumber);
+        });
+
+        svg.appendChild(rect);
+      }
+
+      const plotHeight =
+        (spacesTop > 0 ? SPACE_SIZE : 0) +
+        (spacesBottom > 0 ? SPACE_SIZE : 0) +
+        (spacesTop > 0 && spacesBottom > 0 ? SPACE_GAP : 0);
+
+      rowHeight = Math.max(rowHeight, plotHeight);
+      currentX += plotWidth + SPACE_GAP;
+      maxWidth = Math.max(maxWidth, currentX);
     });
+
+    currentY += rowHeight + SPACE_GAP * 2;
   });
-});
+
+  const totalWidth = maxWidth + margin;
+  const totalHeight = currentY + margin;
+
+  svg.setAttribute("width", totalWidth);
+  svg.setAttribute("height", totalHeight);
+
+  let selectedRect = null;
+
+  function selectSpace(rect, plot, space) {
+    if (selectedRect) {
+      selectedRect.classList.remove("selected");
+    }
+    selectedRect = rect;
+    rect.classList.add("selected");
+
+    const info = getSpaceInfo(plot, space);
+
+    details.innerHTML = `
+      <p><strong>Plot:</strong> ${plot}</p>
+      <p><strong>Space:</strong> ${space}</p>
+      <p><strong>Status:</strong> ${info.status}</p>
+      ${info.name ? `<p><strong>Name:</strong> ${info.name}</p>` : ""}
+      ${info.note ? `<p><strong>Note:</strong> ${info.note}</p>` : ""}
+    `;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", renderMap);
