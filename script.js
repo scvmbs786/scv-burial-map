@@ -26,7 +26,7 @@ function renderMap(spaceStatus) {
   const svg = document.getElementById("burial-map");
   const details = document.getElementById("details-content");
 
-  const margin = 20;
+  const margin = 50;
   let currentY = margin;
   let maxWidth = 0;
 
@@ -66,7 +66,9 @@ function renderMap(spaceStatus) {
           rect.dataset.plot = plot;
           rect.dataset.space = spaceNumber;
 
-          rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
+	  if (status !== "not-available") {
+	    rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
+  	  }
           svg.appendChild(rect);
 
           const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -102,7 +104,9 @@ function renderMap(spaceStatus) {
         rect.dataset.plot = plot;
         rect.dataset.space = spaceNumber;
 
-        rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
+	if (status !== "not-available") {
+		rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
+	}
         svg.appendChild(rect);
 
         const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
