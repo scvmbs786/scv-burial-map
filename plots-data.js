@@ -91,19 +91,68 @@ const plotRows = [
     rowIndex: 9,
     plots: [
       { plot: 900, spacesTop: 4, spacesBottom: 4 },
-      { plot: 901, spacesTop: 4, spacesBottom: 4 }, // your example
+      { plot: 901, spacesTop: 4, spacesBottom: 4 },
       { plot: 902, spacesTop: 4, spacesBottom: 4 },
       { plot: 903, spacesTop: 2, spacesBottom: 2 }
     ]
   }
 ];
 
-// Status data per space (you can edit this as needed)
-const spaceStatus = {
-  // Example entries:
-  // "100-1": { status: "occupied", name: "John Doe", note: "Buried 2020" },
-  // "400-3": { status: "reserved", name: "Family X", note: "Reserved" },
-};
-
 // Default status if not specified
 const DEFAULT_STATUS = "available";
+
+
+// ------------------------------------------------------------
+// 🔥 DYNAMIC GOOGLE SHEETS LOADER
+// ------------------------------------------------------------
+
+async function loadSpaceStatus() {
+  const url =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfS4G2w4E3pPiWBTYFT4NeZETPD35dATRsWENZyLFIMMG3qIi6jhGB_7ktWkvxj1PNH8pXvq3HcnHA/gviz/tq?tqx=out:json";
+
+  const response = await fetch(url);
+  const text = await response.text();
+
+  // Extract JSON from Google’s weird JS wrapper
+  const json = JSON.parse(
+    text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1)
+  );
+
+  const rows = json.table.rows;
+  const spaceStatus = {};
+
+  rows.forEach(row => {
+    const c = row.c;
+    if (!c) return;
+
+    const name = c[0]?.v || "";
+    const plot = c[3]?.v;
+    const spaceRaw = c[4]?.v; // Space Number
+    const statusRaw = c[7]?.v;
+    const note = c[20]?.v || "";
+
+    if (!plot || !spaceRaw) return;
+
+    // Split comma-separated spaces
+    const spaces = spaceRaw.toString().split(",").map(s => s.trim());
+
+    // Normalize status
+    let status = DEFAULT_STATUS;
+    if (statusRaw) {
+      const s = statusRaw.toLowerCase();
+      if (s.includes("occupied")) status = "occupied";
+      else if (s.includes("not")) status = "not-available";
+      else if (s.includes("sold")) status = "reserved";
+      else status = "reserved";
+    }
+
+    spaces.forEach(space => {
+      const key = `${plot}-${space}`;
+      spaceStatus[key] = { status };
+      if (name) spaceStatus[key].name = name;
+      if (note) spaceStatus[key].note = note;
+    });
+  });
+
+  return spaceStatus;
+}

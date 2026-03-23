@@ -2,7 +2,7 @@ function getSpaceKey(plot, space) {
   return `${plot}-${space}`;
 }
 
-function getSpaceInfo(plot, space) {
+function getSpaceInfo(spaceStatus, plot, space) {
   const key = getSpaceKey(plot, space);
   const info = spaceStatus[key] || {};
   return {
@@ -22,7 +22,7 @@ function statusToClass(status) {
   }
 }
 
-function renderMap() {
+function renderMap(spaceStatus) {
   const svg = document.getElementById("burial-map");
   const details = document.getElementById("details-content");
 
@@ -50,37 +50,36 @@ function renderMap() {
 
       // TOP SPACES
       if (spacesTop > 0) {
-      for (let i = 0; i < spacesTop; i++) {
-        const spaceNumber = i + 1;
-        const x = currentX + i * (SPACE_SIZE + SPACE_GAP);
-        const y = currentY;
+        for (let i = 0; i < spacesTop; i++) {
+          const spaceNumber = i + 1;
+          const x = currentX + i * (SPACE_SIZE + SPACE_GAP);
+          const y = currentY;
 
-        const { status } = getSpaceInfo(plot, spaceNumber);
+          const { status } = getSpaceInfo(spaceStatus, plot, spaceNumber);
 
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", x);
-        rect.setAttribute("y", y);
-        rect.setAttribute("width", SPACE_SIZE);
-        rect.setAttribute("height", SPACE_SIZE);
-        rect.setAttribute("class", `space ${statusToClass(status)}`);
-        rect.dataset.plot = plot;
-        rect.dataset.space = spaceNumber;
+          const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+          rect.setAttribute("x", x);
+          rect.setAttribute("y", y);
+          rect.setAttribute("width", SPACE_SIZE);
+          rect.setAttribute("height", SPACE_SIZE);
+          rect.setAttribute("class", `space ${statusToClass(status)}`);
+          rect.dataset.plot = plot;
+          rect.dataset.space = spaceNumber;
 
-        rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
-        svg.appendChild(rect);
+          rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
+          svg.appendChild(rect);
 
-        // Space label
-        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        label.setAttribute("x", x + SPACE_SIZE / 2);
-        label.setAttribute("y", y + SPACE_SIZE / 2);
-        label.setAttribute("class", "space-label");
-        label.textContent = spaceNumber;
-        svg.appendChild(label);
+          const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          label.setAttribute("x", x + SPACE_SIZE / 2);
+          label.setAttribute("y", y + SPACE_SIZE / 2);
+          label.setAttribute("class", "space-label");
+          label.textContent = spaceNumber;
+          svg.appendChild(label);
 
-        maxSpaceX = Math.max(maxSpaceX, x + SPACE_SIZE);
-        maxSpaceY = Math.max(maxSpaceY, y + SPACE_SIZE);
+          maxSpaceX = Math.max(maxSpaceX, x + SPACE_SIZE);
+          maxSpaceY = Math.max(maxSpaceY, y + SPACE_SIZE);
+        }
       }
-    }
 
       // BOTTOM SPACES
       const hasTop = spacesTop > 0;
@@ -92,7 +91,7 @@ function renderMap() {
         const x = currentX + i * (SPACE_SIZE + SPACE_GAP);
         const y = bottomY;
 
-        const { status } = getSpaceInfo(plot, spaceNumber);
+        const { status } = getSpaceInfo(spaceStatus, plot, spaceNumber);
 
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.setAttribute("x", x);
@@ -106,7 +105,6 @@ function renderMap() {
         rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
         svg.appendChild(rect);
 
-        // Space label
         const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
         label.setAttribute("x", x + SPACE_SIZE / 2);
         label.setAttribute("y", y + SPACE_SIZE / 2);
@@ -118,7 +116,7 @@ function renderMap() {
         maxSpaceY = Math.max(maxSpaceY, y + SPACE_SIZE);
       }
 
-      // DRAW PLOT BORDER
+      // PLOT BORDER
       const border = document.createElementNS("http://www.w3.org/2000/svg", "rect");
       border.setAttribute("x", plotStartX - 4);
       border.setAttribute("y", plotStartY - 24);
@@ -127,7 +125,7 @@ function renderMap() {
       border.setAttribute("class", "plot-border");
       svg.appendChild(border);
 
-      // PLOT LABEL (Option A: centered above border)
+      // PLOT LABEL
       const labelX = plotStartX + (maxSpaceX - plotStartX) / 2;
       const labelY = plotStartY - 8;
 
@@ -161,7 +159,7 @@ function renderMap() {
     selectedRect = rect;
     rect.classList.add("selected");
 
-    const info = getSpaceInfo(plot, space);
+    const info = getSpaceInfo(spaceStatus, plot, space);
 
     details.innerHTML = `
       <p><strong>Plot:</strong> ${plot}</p>
@@ -173,4 +171,11 @@ function renderMap() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", renderMap);
+// ------------------------------------------------------------
+// 🔥 Load Google Sheet → Then Render Map
+// ------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  loadSpaceStatus().then(spaceStatus => {
+    renderMap(spaceStatus);
+  });
+});
