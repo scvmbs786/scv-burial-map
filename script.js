@@ -16,6 +16,8 @@ function statusToClass(status) {
   switch (status) {
     case "reserved": return "reserved";
     case "occupied": return "occupied";
+    case "sold": return "occupied"; // sold behaves like occupied visually
+    case "not-available": return "not-available";
     default: return "available";
   }
 }

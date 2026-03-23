@@ -85,6 +85,11 @@ main {
   border-color: #ef4444;
 }
 
+.legend-box.not-available {
+  background: #e5e7eb; /* light gray */
+  border-color: #6b7280; /* darker gray */
+}
+
 /* Spaces */
 
 .space {
@@ -104,6 +109,11 @@ main {
 
 .space.occupied {
   fill: #fee2e2;
+}
+
+.space.not-available {
+  fill: #e5e7eb;
+  stroke: #6b7280;
 }
 
 .space:hover {
