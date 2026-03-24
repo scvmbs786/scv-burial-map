@@ -31,9 +31,10 @@ function renderMap(spaceStatus) {
   const svg = document.getElementById("burial-map");
   const details = document.getElementById("details-content");
 
-  const margin = 50;
-  let currentY = margin;
-  let maxWidth = 0;
+  const marginTop = 50;   // keep top spacing
+  const marginLeft = 20;  // reduce left spacing
+  let currentY = marginTop;
+  let currentX = marginLeft;
 
   while (svg.firstChild) svg.removeChild(svg.firstChild);
 
