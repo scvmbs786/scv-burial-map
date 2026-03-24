@@ -22,6 +22,11 @@ function statusToClass(status) {
   }
 }
 
+function isInteractiveMode() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("interactive") === "true";
+}
+
 function renderMap(spaceStatus) {
   const svg = document.getElementById("burial-map");
   const details = document.getElementById("details-content");
@@ -48,7 +53,9 @@ function renderMap(spaceStatus) {
       let maxSpaceX = plotStartX;
       let maxSpaceY = plotStartY;
 
+      // -----------------------------
       // TOP SPACES
+      // -----------------------------
       if (spacesTop > 0) {
         for (let i = 0; i < spacesTop; i++) {
           const spaceNumber = i + 1;
@@ -66,16 +73,35 @@ function renderMap(spaceStatus) {
           rect.dataset.plot = plot;
           rect.dataset.space = spaceNumber;
 
-          if (status !== "not-available") {
-            rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
-          }
+          // CLICK LOGIC UPDATED HERE
+          rect.addEventListener("click", () => {
+            const info = getSpaceInfo(spaceStatus, plot, spaceNumber);
+
+            if (info.status === "occupied") {
+              selectSpace(rect, plot, spaceNumber);
+              return;
+            }
+
+            if (info.status === "reserved" && isInteractiveMode()) {
+              selectSpace(rect, plot, spaceNumber);
+              return;
+            }
+
+            if (info.status === "available") {
+              selectSpace(rect, plot, spaceNumber);
+              return;
+            }
+
+            // not-available → do nothing
+          });
+
           svg.appendChild(rect);
 
           const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
           label.setAttribute("x", x + SPACE_SIZE / 2);
           label.setAttribute("y", y + SPACE_SIZE / 2);
           label.setAttribute("class", "space-label");
-	  label.textContent = (status === "not-available") ? "X" : spaceNumber;
+          label.textContent = (status === "not-available") ? "X" : spaceNumber;
           svg.appendChild(label);
 
           maxSpaceX = Math.max(maxSpaceX, x + SPACE_SIZE);
@@ -83,7 +109,9 @@ function renderMap(spaceStatus) {
         }
       }
 
+      // -----------------------------
       // BOTTOM SPACES
+      // -----------------------------
       const hasTop = spacesTop > 0;
       const bottomStart = hasTop ? 5 : 1;
       const bottomY = currentY + (hasTop ? SPACE_SIZE + SPACE_GAP : 0);
@@ -104,9 +132,28 @@ function renderMap(spaceStatus) {
         rect.dataset.plot = plot;
         rect.dataset.space = spaceNumber;
 
-        if (status !== "not-available") {
-          rect.addEventListener("click", () => selectSpace(rect, plot, spaceNumber));
-        }
+        // CLICK LOGIC UPDATED HERE
+        rect.addEventListener("click", () => {
+          const info = getSpaceInfo(spaceStatus, plot, spaceNumber);
+
+          if (info.status === "occupied") {
+            selectSpace(rect, plot, spaceNumber);
+            return;
+          }
+
+          if (info.status === "reserved" && isInteractiveMode()) {
+            selectSpace(rect, plot, spaceNumber);
+            return;
+          }
+
+          if (info.status === "available") {
+            selectSpace(rect, plot, spaceNumber);
+            return;
+          }
+
+          // not-available → do nothing
+        });
+
         svg.appendChild(rect);
 
         const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -175,10 +222,8 @@ function renderMap(spaceStatus) {
   }
 }
 
-
-
 // ------------------------------------------------------------
-// 🔍 SEARCH FUNCTION (must be OUTSIDE renderMap)
+// 🔍 SEARCH FUNCTION
 // ------------------------------------------------------------
 function searchSpacesByName(spaceStatus) {
   const input = document.getElementById("searchInput");
@@ -206,8 +251,6 @@ function searchSpacesByName(spaceStatus) {
     }
   });
 }
-
-
 
 // ------------------------------------------------------------
 // 🔥 Load Google Sheet → Then Render Map
