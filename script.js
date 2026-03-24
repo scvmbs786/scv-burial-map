@@ -197,13 +197,39 @@ function renderMap(spaceStatus) {
     const statusLabel =
       info.status === "future" ? "Future Expansion" : info.status;
 
-    tooltipContent.innerHTML = `
-      <p><strong>Plot:</strong> ${plot}</p>
-      <p><strong>Space:</strong> ${space}</p>
-      <p><strong>Status:</strong> ${statusLabel}</p>
-      ${info.name ? `<p><strong>Name:</strong> ${info.name}</p>` : ""}
-      ${info.note ? `<p><strong>Note:</strong> ${info.note}</p>` : ""}
-    `;
+let reserveLink = "";
+
+if (info.status === "available") {
+  const url = new URL("https://docs.google.com/forms/d/e/1FAIpQLSdron8hGlR-ccrKTxk7KJGVu5oIIl5ctH5MvgUJrSGYpjDZmw/viewform");
+
+  // Pre-fill the single Plot/Space field
+  url.searchParams.set("entry.1607234560", `${plot}/${space}`);
+
+  reserveLink = `
+    <p style="margin-top:10px;">
+      <a href="${url.toString()}" target="_blank" style="
+        display:inline-block;
+        padding:6px 10px;
+        background:#2563eb;
+        color:white;
+        border-radius:4px;
+        text-decoration:none;
+        font-size:14px;
+      ">
+        Reserve for Me
+      </a>
+    </p>
+  `;
+}
+
+tooltipContent.innerHTML = `
+  <p><strong>Plot:</strong> ${plot}</p>
+  <p><strong>Space:</strong> ${space}</p>
+  <p><strong>Status:</strong> ${statusLabel}</p>
+  ${info.name ? `<p><strong>Name:</strong> ${info.name}</p>` : ""}
+  ${info.note ? `<p><strong>Note:</strong> ${info.note}</p>` : ""}
+  ${reserveLink}
+`;
 
     const box = rect.getBoundingClientRect();
     tooltip.style.left = `${box.right + 10}px`;

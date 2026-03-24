@@ -127,8 +127,10 @@ main {
 }
 
 .space.future {
-  fill: #c7d2fe;   /* match legend color */
-  stroke: #6366f1; /* match legend border */
+  fill: #c7d2fe;            /* soft indigo */
+  stroke: #6366f1;          /* indigo border */
+  stroke-width: 2;
+  stroke-dasharray: 4 2;    /* subtle dashed border */
 }
 
 .space:hover {
