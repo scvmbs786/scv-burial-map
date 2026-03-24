@@ -13,45 +13,50 @@
 
   <main>
     <section class="map-container">
-     <div>
-      <input 
-        id="searchInput" 
-        type="text" 
-        placeholder="Search by name…" 
-        style="margin-bottom: 12px; padding: 6px 10px; width: 240px; font-size: 16px;"
-      >
-      </div>
       <div>
-      <svg id="burial-map" xmlns="http://www.w3.org/2000/svg"></svg>
-      </div>
-      <div>
-      <ul class="legend">
-        <li><span class="legend-box available"></span> Available</li>
-        <li><span class="legend-box reserved"></span> Reserved</li>
-        <li><span class="legend-box occupied"></span> Occupied</li>
-	<li><span class="legend-box not-available"></span> Not Available</li>
-      </ul>
-      </div>
-<div id="tooltip" class="tooltip hidden">
-  <button class="tooltip-close">×</button>
-  <div id="tooltip-content"></div>
-</div>
-    </section>
-
-    <section class="details-panel">
-      <h2>Space details</h2>
-      <div id="details-content">
-        <p>Select a space on the map.</p>
+        <input 
+          id="searchInput" 
+          type="text" 
+          placeholder="Search by name…" 
+          style="margin-bottom: 12px; padding: 6px 10px; width: 240px; font-size: 16px;"
+        >
       </div>
 
-      <h3>Legend</h3>
-      <ul class="legend">
-        <li><span class="legend-box available"></span> Available</li>
-        <li><span class="legend-box reserved"></span> Reserved</li>
-        <li><span class="legend-box occupied"></span> Occupied</li>
-	<li><span class="legend-box not-available"></span> Not Available</li>
-      </ul>
+      <div>
+        <svg id="burial-map" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+
+      <!-- Tooltip -->
+      <div id="tooltip" class="tooltip hidden">
+        <button class="tooltip-close">×</button>
+        <div id="tooltip-content"></div>
+      </div>
     </section>
+
+    <!-- NEW BOTTOM LEGEND -->
+    <section class="bottom-legends">
+      <div class="legend-row">
+        <div class="legend-item">
+          <span class="legend-box available"></span> Available
+        </div>
+        <div class="legend-item">
+          <span class="legend-box reserved"></span> Reserved
+        </div>
+        <div class="legend-item">
+          <span class="legend-box occupied"></span> Occupied
+        </div>
+      </div>
+
+      <div class="legend-row">
+        <div class="legend-item">
+          <span class="legend-box not-available"></span> Not Available
+        </div>
+        <div class="legend-item">
+          <span class="legend-box future"></span> Future Expansion
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <script src="plots-data.js"></script>
