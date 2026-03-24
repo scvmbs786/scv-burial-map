@@ -6,7 +6,7 @@ function getSpaceInfo(spaceStatus, plot, space) {
   const key = getSpaceKey(plot, space);
   const info = spaceStatus[key] || {};
   return {
-    status: info.status || DEFAULT_STATUS,
+    status: info.status ?? DEFAULT_STATUS,
     name: info.name || null,
     note: info.note || null
   };
