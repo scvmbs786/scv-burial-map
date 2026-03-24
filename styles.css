@@ -126,6 +126,11 @@ main {
   stroke: #6b7280;
 }
 
+.space.future {
+  fill: #c7d2fe;   /* match legend color */
+  stroke: #6366f1; /* match legend border */
+}
+
 .space:hover {
   stroke-width: 2;
   stroke: #111827;
