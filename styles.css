@@ -38,12 +38,14 @@ main {
 }
 
 .details-panel {
-  flex: 1;
+  flex: 0 0 auto;
   background: white;
   border-radius: 8px;
   padding: 1rem 1.25rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   box-sizing: border-box;
+  width: 100%;
+  max-width: 280px; /* or 250px if you want it tighter */
 }
 
 .details-panel h2 {
@@ -159,8 +161,24 @@ main {
   margin: 0.25rem 0;
 }
 
-@media (max-width: 900px) {
-  main {
-    flex-direction: column;
+@media (max-width: 600px) {
+  #searchInput {
+    width: 100%;
+    font-size: 15px;
+  }
+
+  .details-panel,
+  #legend-section {
+    width: 100%;
+    max-width: none;
+    margin-bottom: 1rem;
+  }
+
+  .map-container {
+    padding: 0.5rem;
+  }
+
+  #search-bar-container {
+    padding: 10px 1rem;
   }
 }
