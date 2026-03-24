@@ -18,6 +18,7 @@ function statusToClass(status) {
     case "occupied": return "occupied";
     case "sold": return "occupied";
     case "not-available": return "not-available";
+    case "future": return "future";   // NEW
     default: return "available";
   }
 }
@@ -30,7 +31,6 @@ function isInteractiveMode() {
 function renderMap(spaceStatus) {
   const svg = document.getElementById("burial-map");
 
-  // Tooltip elements
   const tooltip = document.getElementById("tooltip");
   const tooltipContent = document.getElementById("tooltip-content");
 
@@ -163,7 +163,7 @@ function renderMap(spaceStatus) {
     });
 
     currentY += rowHeight + SPACE_GAP * 2;
-    currentX = marginLeft; // reset for next row
+    currentX = marginLeft;
   });
 
   svg.setAttribute("width", maxWidth + marginLeft + 20);
@@ -172,12 +172,13 @@ function renderMap(spaceStatus) {
   let selectedRect = null;
 
   // -----------------------------
-  // CLICK HANDLER WITH RULES + TOOLTIP
+  // CLICK HANDLER (with future support)
   // -----------------------------
   function handleClick(rect, plot, space) {
     const info = getSpaceInfo(spaceStatus, plot, space);
 
     if (info.status === "not-available") return;
+    if (info.status === "future") return; // NEW: future spaces not clickable
     if (info.status === "reserved" && !isInteractiveMode()) return;
 
     selectSpace(rect, plot, space);
@@ -193,10 +194,13 @@ function renderMap(spaceStatus) {
 
     const info = getSpaceInfo(spaceStatus, plot, space);
 
+    const statusLabel =
+      info.status === "future" ? "Future Expansion" : info.status;
+
     tooltipContent.innerHTML = `
       <p><strong>Plot:</strong> ${plot}</p>
       <p><strong>Space:</strong> ${space}</p>
-      <p><strong>Status:</strong> ${info.status}</p>
+      <p><strong>Status:</strong> ${statusLabel}</p>
       ${info.name ? `<p><strong>Name:</strong> ${info.name}</p>` : ""}
       ${info.note ? `<p><strong>Note:</strong> ${info.note}</p>` : ""}
     `;
@@ -249,12 +253,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("searchInput");
     input.addEventListener("input", () => searchSpacesByName(spaceStatus));
 
-    // Tooltip close button
     document.querySelector(".tooltip-close").addEventListener("click", () => {
       document.getElementById("tooltip").classList.add("hidden");
     });
 
-    // Hide tooltip when clicking outside
     document.addEventListener("click", (e) => {
       const tooltip = document.getElementById("tooltip");
       if (!tooltip.contains(e.target) && !e.target.classList.contains("space")) {
