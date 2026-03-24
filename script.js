@@ -75,7 +75,7 @@ function renderMap(spaceStatus) {
           label.setAttribute("x", x + SPACE_SIZE / 2);
           label.setAttribute("y", y + SPACE_SIZE / 2);
           label.setAttribute("class", "space-label");
-          label.textContent = spaceNumber;
+	  label.textContent = (status === "not-available") ? "X" : spaceNumber;
           svg.appendChild(label);
 
           maxSpaceX = Math.max(maxSpaceX, x + SPACE_SIZE);
@@ -113,7 +113,7 @@ function renderMap(spaceStatus) {
         label.setAttribute("x", x + SPACE_SIZE / 2);
         label.setAttribute("y", y + SPACE_SIZE / 2);
         label.setAttribute("class", "space-label");
-        label.textContent = spaceNumber;
+        label.textContent = (status === "not-available") ? "X" : spaceNumber;
         svg.appendChild(label);
 
         maxSpaceX = Math.max(maxSpaceX, x + SPACE_SIZE);
