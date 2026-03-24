@@ -131,6 +131,7 @@ async function loadSpaceStatus() {
       if (s.includes("occupied")) status = "occupied";
       else if (s.includes("not")) status = "not-available";
       else if (s.includes("sold")) status = "reserved";
+      else if (s.includes("future")) status = "future";
       else status = "reserved";
     }
 
