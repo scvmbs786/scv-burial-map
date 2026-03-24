@@ -29,17 +29,21 @@ function isInteractiveMode() {
 
 function renderMap(spaceStatus) {
   const svg = document.getElementById("burial-map");
-  const details = document.getElementById("details-content");
 
-  const marginTop = 50;   // keep top spacing
-  const marginLeft = 20;  // reduce left spacing
+  // Tooltip elements
+  const tooltip = document.getElementById("tooltip");
+  const tooltipContent = document.getElementById("tooltip-content");
+
+  const marginTop = 50;
+  const marginLeft = 20;
+
   let currentY = marginTop;
   let currentX = marginLeft;
+  let maxWidth = 0;
 
   while (svg.firstChild) svg.removeChild(svg.firstChild);
 
   plotRows.forEach((row) => {
-    let currentX = margin;
     let rowHeight = 0;
 
     row.plots.forEach((plotDef) => {
@@ -74,27 +78,7 @@ function renderMap(spaceStatus) {
           rect.dataset.plot = plot;
           rect.dataset.space = spaceNumber;
 
-          // CLICK LOGIC UPDATED HERE
-          rect.addEventListener("click", () => {
-            const info = getSpaceInfo(spaceStatus, plot, spaceNumber);
-
-            if (info.status === "occupied") {
-              selectSpace(rect, plot, spaceNumber);
-              return;
-            }
-
-            if (info.status === "reserved" && isInteractiveMode()) {
-              selectSpace(rect, plot, spaceNumber);
-              return;
-            }
-
-            if (info.status === "available") {
-              selectSpace(rect, plot, spaceNumber);
-              return;
-            }
-
-            // not-available → do nothing
-          });
+          rect.addEventListener("click", () => handleClick(rect, plot, spaceNumber));
 
           svg.appendChild(rect);
 
@@ -133,27 +117,7 @@ function renderMap(spaceStatus) {
         rect.dataset.plot = plot;
         rect.dataset.space = spaceNumber;
 
-        // CLICK LOGIC UPDATED HERE
-        rect.addEventListener("click", () => {
-          const info = getSpaceInfo(spaceStatus, plot, spaceNumber);
-
-          if (info.status === "occupied") {
-            selectSpace(rect, plot, spaceNumber);
-            return;
-          }
-
-          if (info.status === "reserved" && isInteractiveMode()) {
-            selectSpace(rect, plot, spaceNumber);
-            return;
-          }
-
-          if (info.status === "available") {
-            selectSpace(rect, plot, spaceNumber);
-            return;
-          }
-
-          // not-available → do nothing
-        });
+        rect.addEventListener("click", () => handleClick(rect, plot, spaceNumber));
 
         svg.appendChild(rect);
 
@@ -199,13 +163,29 @@ function renderMap(spaceStatus) {
     });
 
     currentY += rowHeight + SPACE_GAP * 2;
+    currentX = marginLeft; // reset for next row
   });
 
-  svg.setAttribute("width", maxWidth + margin);
-  svg.setAttribute("height", currentY + margin);
+  svg.setAttribute("width", maxWidth + marginLeft + 20);
+  svg.setAttribute("height", currentY + 20);
 
   let selectedRect = null;
 
+  // -----------------------------
+  // CLICK HANDLER WITH RULES + TOOLTIP
+  // -----------------------------
+  function handleClick(rect, plot, space) {
+    const info = getSpaceInfo(spaceStatus, plot, space);
+
+    if (info.status === "not-available") return;
+    if (info.status === "reserved" && !isInteractiveMode()) return;
+
+    selectSpace(rect, plot, space);
+  }
+
+  // -----------------------------
+  // SELECT SPACE → SHOW TOOLTIP
+  // -----------------------------
   function selectSpace(rect, plot, space) {
     if (selectedRect) selectedRect.classList.remove("selected");
     selectedRect = rect;
@@ -213,18 +193,24 @@ function renderMap(spaceStatus) {
 
     const info = getSpaceInfo(spaceStatus, plot, space);
 
-    details.innerHTML = `
+    tooltipContent.innerHTML = `
       <p><strong>Plot:</strong> ${plot}</p>
       <p><strong>Space:</strong> ${space}</p>
       <p><strong>Status:</strong> ${info.status}</p>
       ${info.name ? `<p><strong>Name:</strong> ${info.name}</p>` : ""}
       ${info.note ? `<p><strong>Note:</strong> ${info.note}</p>` : ""}
     `;
+
+    const box = rect.getBoundingClientRect();
+    tooltip.style.left = `${box.right + 10}px`;
+    tooltip.style.top = `${box.top - 10}px`;
+
+    tooltip.classList.remove("hidden");
   }
 }
 
 // ------------------------------------------------------------
-// 🔍 SEARCH FUNCTION
+// SEARCH FUNCTION
 // ------------------------------------------------------------
 function searchSpacesByName(spaceStatus) {
   const input = document.getElementById("searchInput");
@@ -254,7 +240,7 @@ function searchSpacesByName(spaceStatus) {
 }
 
 // ------------------------------------------------------------
-// 🔥 Load Google Sheet → Then Render Map
+// LOAD DATA → RENDER MAP
 // ------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
   loadSpaceStatus().then(spaceStatus => {
@@ -262,5 +248,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const input = document.getElementById("searchInput");
     input.addEventListener("input", () => searchSpacesByName(spaceStatus));
+
+    // Tooltip close button
+    document.querySelector(".tooltip-close").addEventListener("click", () => {
+      document.getElementById("tooltip").classList.add("hidden");
+    });
+
+    // Hide tooltip when clicking outside
+    document.addEventListener("click", (e) => {
+      const tooltip = document.getElementById("tooltip");
+      if (!tooltip.contains(e.target) && !e.target.classList.contains("space")) {
+        tooltip.classList.add("hidden");
+      }
+    });
   });
 });
